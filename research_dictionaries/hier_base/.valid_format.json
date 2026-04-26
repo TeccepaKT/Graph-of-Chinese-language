@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "related_words": {
+      "type": "array",
+      "additionalItems": {
+        "type": "array",
+        "items": [
+          { "type": "string" },
+          { "type": "number", "exclusiveMinimum": 0, "maximum": 10 }
+        ],
+        "additionalItems": false
+      }
+    }
+  },
+  "required": ["related_words"],
+  "patternProperties": {
+    "^_": {}
+  },
+  "additionalProperties": false
+}

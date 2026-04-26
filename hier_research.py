@@ -2,6 +2,8 @@ import os
 import argparse
 
 
+print('[*] Launch...')
+
 filename: str = os.path.basename(__file__)
 
 modes: dict[str, str] = {
@@ -32,8 +34,8 @@ def main():
         from research_ai.hier_research import run
         run(safety=args.safety)
     elif args.mode == 'dicts':
-        from research_ai.hier_research import run
-        run(safety=args.safety)
+        from research_dictionaries.hier_research import run
+        run()#safety=args.safety)
 
 
 if __name__ == '__main__':

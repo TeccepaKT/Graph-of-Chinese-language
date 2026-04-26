@@ -1,5 +1,3 @@
-print('[ ] Launch...')
-
 import sys
 import re
 

@@ -394,8 +394,6 @@ class DeepseekBrowserTab:
         Mouse.click()
         sleep(1.6)  # Скопированный текст не сразу становится доступен
         
-        print(repr(pyperclip.paste()))
-        
         return pyperclip.paste()
 
     def _get_copy_button_pos(self) -> Optional[tuple[int, int]]:
@@ -497,6 +495,7 @@ class DeepseekChat(_AI_Chat, DeepseekBrowserTab):
         self._wait_answer()
 
         res: str = self._get_generated_response()
+        return res
 
 
     ### <---- DeepseekBrowserTab
@@ -525,6 +524,9 @@ class DummyChat(_AI_Chat):
 
 
 def main():
+    chat = DeepseekChat()
+    chat.load()
+
     answer = chat.get_response("Hi!")
     print('RECEIVED RESPONSE:', repr(answer))
 

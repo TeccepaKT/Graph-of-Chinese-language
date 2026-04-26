@@ -115,21 +115,21 @@ class Base:
             f.write(text)
 
 
-    def form_and_write(self, hier: str, text: str):
+    def form_and_write(self, hier: str, text: str, *, rewrite: bool = False):
         """ Безопасно добавить файл для hier с содержимым text
             В файл допишутся дополнительные данные
             Кроме того, пройдёт проверка файла на формат """
         text = self._attach_additional_info(text)
-        validator.validate(text, self._valid_format_scheme, responding=validator.Responding.SOFT, message=hier)
+        validator.validate(text, self._valid_format_scheme, responding=validator.Responding.SOFT, identifier=hier)
 
         path = f'{self._path}/{hier}.json'
-        if os.path.exists(path):
+        if os.path.exists(path) and not rewrite:
             print(f"[*] File already exists: {path}. Did not rewrite")
             return
 
         with open(path, 'w') as f:
             f.write(text)
-        base.add(hier)
+        self._contains.add(hier)
 
 
 # Базы с версиями форматирования

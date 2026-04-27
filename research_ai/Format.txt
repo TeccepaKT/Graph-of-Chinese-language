@@ -1,0 +1,32 @@
+{
+    "weight": float,
+    "level": {
+        "value": list[int, int],
+        "comment": str
+    },
+    "related_themes": {
+        "$НАЗВАНИЕ_ТЕМЫ": {
+            "relation": float,
+            "comment": str,
+            "words": list[str]
+        },
+        # ...
+    },
+    "neccessary_themes": {
+        "$НАЗВАНИЕ_ТЕМЫ": {
+            "importance": float,
+            "comment": str,
+            "words": list[str]
+        },
+        # ...
+    },
+    "grammar_themes": {
+        "$НАЗВАНИЕ_ТЕМЫ": {
+            "relation": float,
+            "comment": str,
+            "words": list[str]
+        },
+        # ...
+    },
+    "related_words": list[list[str, float]]
+}

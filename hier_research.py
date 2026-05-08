@@ -15,8 +15,10 @@ from hieroglyph_frequency_lists.hier_dictionaries import subtlex_dictionary
 
 
 modes: dict[str, str] = {
-    'dicts': 'researching with downloaded dictionaries and vector bases',
-    'ai': 'researching with ai'
+    'dicts': 'researching with downloaded dictionaries '
+             'and vector bases',
+    'ai_browser': 'researching with ai via browser',
+    'ai_api': 'researching with ai via api'
 }  # Режимы изучения с их описаниями в документации
 
 
@@ -56,11 +58,17 @@ def main():
     if args.safety:
         Logger.log('[i] Safety mode on')
 
-    if args.mode == 'ai':
+    if args.mode == 'ai_browser':
         from research_ai.hier_research import AIChatResearcher
-        from research_ai.ai_requests.chats import DeepseekChat
+        from research_ai.ai_requests.deepseek_chat import DeepseekChat
 
         infinite_research(AIChatResearcher(DeepseekChat(), safety_mode=args.safety))
+
+    if args.mode == 'ai_api':
+        from research_ai.hier_research import AIChatResearcher
+        from research_ai.ai_requests.api_chat import APIChat
+
+        infinite_research(AIChatResearcher(APIChat(), safety_mode=args.safety))
 
     elif args.mode == 'dicts':
         from research_dictionaries.hier_research import DictsResearcher

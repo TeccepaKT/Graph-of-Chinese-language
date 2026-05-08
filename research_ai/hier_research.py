@@ -11,7 +11,7 @@ from loggers import ResearchLogger as Logger
 from researcher import Researcher
 from work_with_bases.bases import base_ai
 from hieroglyph_frequency_lists.hier_dictionaries import hanzi_dictionary
-from research_ai.ai_requests.chats import DummyChat, AIChat, random_num
+from research_ai.ai_requests.chat import DummyChat, AIChat, random_num
 
 
 class Paths:

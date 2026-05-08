@@ -1,45 +1,64 @@
+"""
+
+Изучение иероглифов по словарям
+
+"""
+
+import json
+from typing import TypeAlias, Callable
+
 from word_similarity import WordSimilarity2010
-#from most_similar...
 
-from loggers import ResearchLogger as Logger
+from chinese import Hieroglyph
+from researcher import Researcher
 from work_with_bases.bases import base_dicts
-from hieroglyph_frequency_lists.hier_dictionaries import \
-    subtlex_hier_freq_list, bcc_hier_freq_list
+from hieroglyph_frequency_lists.hier_dictionaries import subtlex_dictionary
 
 
-similarity = WordSimilarity2010().similarity
+Num: TypeAlias = int | float
 
 
-def get_relations(hier: str, hiers: list[str]) -> list[str, float]:
-    """ Получение ближайших по смыслу иероглифов к данному """
-    sim: list[list[str, float]] = []
-    minsim: float = 0.8  # Наименьшая связь для вхождения
-    tosim: float = 0.1  # Нормализация значения: будет входить в пределы [tosim, 1]
+similarity: Callable[[Hieroglyph, Hieroglyph], Num] = WordSimilarity2010().similarity  # Схожесть двух иероглифов
+
+
+def get_relations(base_hier: Hieroglyph, pool: list[Hieroglyph]) -> list[tuple[Hieroglyph, Num]]:
+    """ Получение ближайших по смыслу иероглифов среди данных """
+    sim: list[tuple[Hieroglyph, Num]] = []
+    min_sim: Num = 0.8  # Наименьшая связь для вхождения в ответ
+    to_sim: Num = 0.1  # Нормализация значения: оно будет в [to_sim, 1]
     
-    for h in hiers:
-        if hier == h:
+    for hier in pool:
+        if hier == base_hier:
             continue
         
-        s = similarity(hier, h)
-        if s < minsim:
-            continue
-        
-        sim.append([h, 1 - (1 - s) / (1 - minsim) * (1 - tosim)])
+        s: Num = similarity(hier, base_hier)
+        if s < min_sim:
+            continue  # Слишком малая схожесть
+
+        value: Num = 1 - (1 - s) / (1 - min_sim) * (1 - to_sim)  # Нормализация
+        sim.append((Hieroglyph.from_validated(hier), value))  # Добавление
     
-    sim.sort(key=lambda t: t[1], reverse=True)
-    return [[h, round(s * 10, 3)] for h, s in sim]
+    sim.sort(key=lambda t: t[1], reverse=True)  # Сначала наиболее похожие
+    return sim
 
 
-def run():
-    pool: int = 3000
-    hiers: list[str] = subtlex_hier_freq_list[:pool]
-    
-    for i, hier in enumerate(hiers):
-        relations = get_relations(hier, hiers)
-        text = '{\n    "related_words": ' + repr(relations).replace("'", '"') + '\n}'
+class DictsResearcher(Researcher):
+    """ Исследователь иероглифов со словарями """
+
+    # Параметры изучения
+    _pool_size: int = 3000  # Рассматривать иероглифов в словаре
+
+    # Поля
+    pool: list[Hieroglyph]  # Рассматриваемые иероглифы
+
+    def __init__(self):
+        self.pool = subtlex_dictionary.get_frequency_list()[:self._pool_size]
+
+    def research(self, hier: Hieroglyph):
+        """ Изучение иероглифа относительно иероглифов из pool """
+        if hier not in self.pool:
+            raise ValueError('This hieroglyph is not in the pool. Increase the _pool_size value')
+
+        relations: list[tuple[Hieroglyph, Num]] = get_relations(hier, self.pool)
+        text: str = json.dumps({'related_words': relations})
         base_dicts.form_and_write(hier, text, rewrite=True)
-        
-        Logger.log(f'[_] Ended {hier} (№{i + 1}), go forward')
-        if i == 50:
-            break
-

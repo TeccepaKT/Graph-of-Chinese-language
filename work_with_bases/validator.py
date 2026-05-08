@@ -1,3 +1,9 @@
+"""
+
+Валидация json-файлов на основе JSON Schema
+
+"""
+
 from enum import Enum, auto
 
 import json
@@ -5,20 +11,22 @@ import jsonschema
 
 
 class Responding(Enum):
-    SOFT = auto()  # Только вывод о наличии несоответствия формата
-    MIXED = auto()  # Только вывод о несоответствии с указанием места ошибки
-    HARD = auto()  # Бросить исключение при несоответствии
+    """ Реагирование на несоответствия с JSON Schema """
+    SOFT = auto()  # Вывод только о наличии несоответствия формата
+    MIXED = auto()  # Вывод только о несоответствии с указанием места
+    HARD = auto()  # Бросить исключение при несоответствии с указанием места
 
 
 invalid_identifiers: list[str] = []  # Объекты для исправления
 
 
-def validate(instance: str, schema: object, responding: Responding = Responding.HARD, identifier: str = ''):
+def validate(instance: str, schema: dict, responding: Responding = Responding.HARD, identifier: str = ''):
     """ Проверить на соответствие формату
         instance должен быть именно str, так как проверяется и синтаксис """
     try:
         instance = json.loads(instance)
         jsonschema.validate(instance, schema)
+
     except Exception as e:
         print(f'[v] Bad format: {identifier}')
         if responding == Responding.HARD:

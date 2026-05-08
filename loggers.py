@@ -1,3 +1,9 @@
+"""
+
+Логгирование разных частей программы
+
+"""
+
 import sys
 
 from typing import Callable
@@ -11,16 +17,18 @@ class DepthLogger(ABC):
 
 	@staticmethod
 	def get_depth() -> int:
+		""" Глубина (уровень вложенности) лога.
+			Глубина влияет на отображение """
 		return DepthLogger._depth
 
 	@staticmethod
 	def add_depth(value: int = 1):
-		""" Увеличить глубину (уровень вложенности) лога.
-			Глубина влияет на отображение """
+		""" Увеличить глубину """
 		DepthLogger._depth += value
 
 	@staticmethod
 	def reduce_depth(value: int = 1):
+		""" Уменьшить глубину лога """
 		DepthLogger.add_depth(-value)
 
 
@@ -31,14 +39,12 @@ class AIDebugLogger(DepthLogger):
 	@staticmethod
 	def log(*args, **kwargs):
 		""" Вывести сообщение """
-		print(end = ' ' * (2 * AIDebugLogger.get_depth() + 1) + '- ', file=AIDebugLogger._file)
+		print(end=' ' * (2 * AIDebugLogger.get_depth() + 1) + '- ', file=AIDebugLogger._file)
 		print(*args, **kwargs, file=AIDebugLogger._file)
 
 	@staticmethod
-	def logging(
-		level: "0 | 1" = 0  # Уровень лога
-	) -> Callable:
-		""" Логгирование вызова и завершения функции """
+	def logging(importance: int = 0) -> Callable:
+		""" Декоратор для логгирование вызовов и завершений функций """
 		def deco(f: Callable):
 			@wraps(f)
 			def wrapper(*args, **kwargs):
@@ -46,7 +52,7 @@ class AIDebugLogger(DepthLogger):
 				AIDebugLogger.add_depth()
 				res = f(*args, **kwargs)
 				AIDebugLogger.reduce_depth()
-				AIDebugLogger.log(f.__name__, 'ended' if level == 0 or AIDebugLogger._depth != 0 else 'ended\n')
+				AIDebugLogger.log(f.__name__, 'ended' if importance == 0 or AIDebugLogger._depth != 0 else 'ended\n')
 				return res
 
 			return wrapper
@@ -61,5 +67,5 @@ class ResearchLogger(DepthLogger):
 	@staticmethod
 	def log(*args, **kwargs):
 		""" Вывести сообщение """
-		print(end = ' ' * (4 * ResearchLogger._depth + 1), file=ResearchLogger._file)
+		print(end=' ' * (4 * ResearchLogger._depth + 1), file=ResearchLogger._file)
 		print(*args, **kwargs, file=ResearchLogger._file)

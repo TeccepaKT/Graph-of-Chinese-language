@@ -6,11 +6,6 @@
 
 __version__ = '1.3.0.011'
 
-"""
-
-Changelog смотрите в каждом файле
-
-"""
 
 from .chinese import *
 # Чтобы не импортировать chinese.chinese

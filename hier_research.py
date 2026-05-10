@@ -26,7 +26,7 @@ def infinite_research(researcher: Researcher):
     """ Изучение иероглифов по списку """
     for i, hier in enumerate(subtlex_dictionary.get_frequency_list()):
         researcher.deep_research(hier)
-        Logger.log(f'[_] Ended {hier} (№{i + 1}), go forward\n')
+        Logger.log(f'Ended {hier} (№{i + 1}), go forward\n', type=Logger.MessageType.UNDERSCORE)
         sleep(0.01)
 
 
@@ -51,18 +51,20 @@ def main():
                         help='safety mode — data will not be changed')
     args: Any = parser.parse_args()
 
-    Logger.log('[*] Launch...')
+    Logger.log('Launch...', type=Logger.MessageType.STAR)
 
     if args.silent:
-        Logger.log('[i] Silent mode on')
+        Logger.log('Silent mode on', type=Logger.MessageType.I)
     if args.safety:
-        Logger.log('[i] Safety mode on')
+        Logger.log('Safety mode on', type=Logger.MessageType.I)
 
     if args.mode == 'ai_browser':
         from research_ai.hier_research import AIChatResearcher
         from research_ai.ai_requests.deepseek_chat import DeepseekChat
 
-        infinite_research(AIChatResearcher(DeepseekChat(), safety_mode=args.safety))
+        chat = DeepseekChat()
+        chat.load()
+        infinite_research(AIChatResearcher(chat, safety_mode=args.safety))
 
     if args.mode == 'ai_api':
         from research_ai.hier_research import AIChatResearcher

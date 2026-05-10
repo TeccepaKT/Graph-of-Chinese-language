@@ -10,6 +10,7 @@ from typing import Any
 from time import time
 
 from chinese import is_hieroglyph
+from loggers import ResearchLogger as Logger
 from work_with_bases import validator
 
 
@@ -67,9 +68,10 @@ class Base:
             
             self._contains.add(hier)
 
-        print('[v] Base validated')
+        Logger.log('Base validated', type=Logger.MessageType.V)
         if validator.invalid_identifiers:
-            print(f'[v] Please fix the following: {" ".join(validator.invalid_identifiers)}')
+            text: str = ' '.join(validator.invalid_identifiers)
+            Logger.log(f'Please fix the following: {text}', type=Logger.MessageType.V)
 
     def __contains__(self, hier: str) -> bool:
         """ Есть ли иероглиф в базе """
@@ -135,5 +137,5 @@ class Base:
 
 
 # Базы с версиями форматирования
-base_ai: Base = Base('research_ai/hier_base', {'_version': '1.3.1'})
+base_ai: Base = Base('research_ai/hier_base', {'_version': '1.3.2'})
 base_dicts: Base = Base('research_dictionaries/hier_base', {'_version': '1.0.0'})

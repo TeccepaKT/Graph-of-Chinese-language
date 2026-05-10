@@ -66,11 +66,11 @@ class AIChatResearcher(Researcher):
         hier: Hieroglyph = hier.simplified()
 
         if hier in base_ai:
-            Logger.log(f'[ ] Already in base: {hier}')
+            Logger.log(f'Already in base: {hier}', type=Logger.MessageType.SPACE)
             return
 
         # Получение информации
-        Logger.log(f'    Considering {hier}...', end='\n')
+        Logger.log(f'    Considering {hier}...', end='\r', type=Logger.MessageType.VOID)
         json: str = self.chat.get_response(AIChatResearcher._get_request_text(hier))
 
         # Запись
@@ -90,14 +90,14 @@ class AIChatResearcher(Researcher):
         else:
             Logger.log("SAFETY: Добавить PHONY-файл")
 
-        Logger.log(f'[i] Added: {hier}')
+        Logger.log(f'Added: {hier}', Logger.MessageType.I)
         self._researched += 1
         sleep(random_num(*self._research_pause_interval))  # Не слишком частые запросы
 
     def deep_research(self, hier: Hieroglyph, *, level: int = 1):
         """ Глубокое изучение: рекурсивно изучать все (или некоторые) связи """
         if self._researched == self.max_researched:
-            Logger.log("[/] The greatest knowledge has been reached")
+            Logger.log('The greatest knowledge has been reached', type=Logger.MessageType.SLASH)
             self._max_researched_reached = True
             return
 
@@ -110,7 +110,7 @@ class AIChatResearcher(Researcher):
         data: dict | list = base_ai.read_json(hier)  # Получение информации о иероглифе
         been: set[Hieroglyph] = set()  # Запоминание того, какие иероглифы уже были рассмотрены
 
-        Logger.log(f"[>] Deep research of {hier}:")
+        Logger.log(f'Deep research of {hier}:', type=Logger.MessageType.GT)
         Logger.add_depth()
 
         for word, relation in data['related_words']:  # Просмотр всех связанных слов

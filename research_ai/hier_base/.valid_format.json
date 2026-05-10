@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "weight": {
+        "oneOf": [
+            { "type": "number", "minimum": 0, "maximum": 10 },
+            {
+                "type": "object",
+                "properties": {
+                    "value": { "type": "number", "minimum": 0, "maximum": 10 },
+                    "comment": { "type": "string" }
+                },
+                "required": ["value", "comment"],
+                "additionalProperties": false
+            }
+        ]
+    },
+    "level": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "array",
+          "items": [
+            { "type": "integer", "minimum": 10 },
+            { "type": "integer", "maximum": 100 }
+          ],
+          "additionalItems": false
+        },
+        "comment": { "type": "string" }
+      },
+      "required": ["value", "comment"],
+      "additionalProperties": false
+    },
+    "related_themes": {
+      "type": "object",
+      "description": "Темы с динамическими ключами $НАЗВАНИЕ_ТЕМЫ",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "relation": { "type": "number", "exclusiveMinimum": 0, "maximum": 10 },
+          "comment": { "type": "string" },
+          "words": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["relation", "comment", "words"],
+        "additionalProperties": false
+      }
+    },
+    "neccessary_themes": {
+      "type": "object",
+      "description": "Темы с динамическими ключами $НАЗВАНИЕ_ТЕМЫ",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "importance": { "type": "number", "exclusiveMinimum": 0, "maximum": 10 },
+          "comment": { "type": "string" },
+          "words": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["importance", "comment", "words"],
+        "additionalProperties": false
+      }
+    },
+    "grammar_themes": {
+      "type": "object",
+      "description": "Темы с динамическими ключами $НАЗВАНИЕ_ТЕМЫ",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "relation": { "type": "number", "exclusiveMinimum": 0, "maximum": 10 },
+          "comment": { "type": "string" },
+          "words": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["relation", "comment", "words"],
+        "additionalProperties": false
+      }
+    },
+    "related_words": {
+      "type": "array",
+      "description": "Список пар [слово, его_связь]",
+      "items": {
+        "type": "array",
+        "items": [
+          { "type": "string" },
+          { "type": "number", "exclusiveMinimum": 0, "maximum": 10 }
+        ],
+        "additionalItems": false
+      }
+    }
+  },
+  "required": [
+    "weight",
+    "level",
+    "related_themes",
+    "neccessary_themes",
+    "grammar_themes",
+    "related_words"
+  ],
+  "patternProperties": {
+    "^_": {}
+  },
+  "additionalProperties": false
+}

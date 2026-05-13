@@ -20,7 +20,8 @@ from PIL.ImageGrab import grab
 
 from chinese.pyclr import RGB, hex_to_rgb, rgb_diff
 from loggers import AIDebugLogger as Logger
-from research_ai.ai_requests.chat import AIChat, random_num
+from utils.functions import random_num
+from research_ai.ai_requests.chat import AIChat
 from research_ai.ai_requests.mouse_control import Mouse
 from research_ai.ai_requests.keyboard_control import hotkey, write
 from research_ai.ai_requests.work_with_browser import Browser

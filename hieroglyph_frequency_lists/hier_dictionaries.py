@@ -12,9 +12,11 @@
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
-from typing import TypeAlias, Callable, Optional
+from typing import Callable, Optional
 from functools import wraps
 
+from utils.functions import Num
+from utils.paths import Paths
 from hanzipy.dictionary import HanziDictionary, NotAHanziCharacter
 from chinese.chinese import Hieroglyph
 
@@ -22,15 +24,7 @@ from chinese.chinese import Hieroglyph
 __version__ = '2.0.0 HT'  # Changelog deleted
 
 
-Num: TypeAlias = int | float
-
 INF: float = float('inf')
-
-
-class Paths:
-    """ Пути к файлам проекта """
-    bcc_dictionary: str = 'hieroglyph_frequency_lists/lists/BCC/global_wordfreq.release.txt'
-    subtlex_dictionary: str = 'hieroglyph_frequency_lists/lists/SUBTLEX-CH/SUBTLEX-CH-CHR'
 
 
 class SingletonMeta(type):

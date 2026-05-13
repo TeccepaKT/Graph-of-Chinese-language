@@ -9,15 +9,11 @@ from time import sleep
 from chinese import Hieroglyph
 from loggers import ResearchLogger as Logger
 from researcher import Researcher
-from work_with_bases.bases import base_ai
+from utils.paths import Paths
+from utils.functions import random_num
+from work_with_bases.ai_base import ai_base
 from hieroglyph_frequency_lists.hier_dictionaries import hanzi_dictionary
-from research_ai.ai_requests.chat import DummyChat, AIChat, random_num
-
-
-class Paths:
-    """ Пути к файлам проекта """
-    prompt_file: str = 'research_ai/Prompt.txt'
-    format_file: str = 'research_ai/Format.txt'
+from research_ai.ai_requests.chat import DummyChat, AIChat
 
 
 class AIChatResearcher(Researcher):
@@ -65,7 +61,7 @@ class AIChatResearcher(Researcher):
         """ Добавить файл о иероглифе, если его ещё нет в базе """
         hier: Hieroglyph = hier.simplified()
 
-        if hier in base_ai:
+        if hier in ai_base:
             Logger.log(f'Already in base: {hier}', type=Logger.MessageType.SPACE)
             return
 
@@ -76,7 +72,7 @@ class AIChatResearcher(Researcher):
         # Запись
         if not json:
             raise ValueError('Возвращён пустой ответ. Возможно, он не был скопирован.')
-        base_ai.save_raw(hier, json)
+        ai_base.save_raw(hier, json)
 
         # Исправление формата
         json = json.strip('`')
@@ -86,7 +82,7 @@ class AIChatResearcher(Researcher):
 
         # Запись в базу
         if not AIChatResearcher.safety_mode:
-            base_ai.form_and_write(hier, json)
+            ai_base.form_and_write(hier, json)
         else:
             Logger.log("SAFETY: Добавить PHONY-файл")
 
@@ -107,7 +103,7 @@ class AIChatResearcher(Researcher):
             return
 
         # Глубокое изучение
-        data: dict | list = base_ai.read_json(hier)  # Получение информации о иероглифе
+        data: dict = ai_base.read_json(hier)  # Получение информации о иероглифе
         been: set[Hieroglyph] = set()  # Запоминание того, какие иероглифы уже были рассмотрены
 
         Logger.log(f'Deep research of {hier}:', type=Logger.MessageType.GT)

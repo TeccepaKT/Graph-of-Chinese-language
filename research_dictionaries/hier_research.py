@@ -5,17 +5,15 @@
 """
 
 import json
-from typing import TypeAlias, Callable
+from typing import Callable
 
 from word_similarity import WordSimilarity2010
 
 from chinese import Hieroglyph
+from utils.functions import Num
 from researcher import Researcher
-from work_with_bases.bases import base_dicts
+from work_with_bases.dicts_base import dicts_base
 from hieroglyph_frequency_lists.hier_dictionaries import subtlex_dictionary
-
-
-Num: TypeAlias = int | float
 
 
 similarity: Callable[[Hieroglyph, Hieroglyph], Num] = WordSimilarity2010().similarity  # Схожесть двух иероглифов
@@ -61,4 +59,4 @@ class DictsResearcher(Researcher):
 
         relations: list[tuple[Hieroglyph, Num]] = get_relations(hier, self.pool)
         text: str = json.dumps({'related_words': relations})
-        base_dicts.form_and_write(hier, text, rewrite=True)
+        dicts_base.form_and_write(hier, text, rewrite=True)

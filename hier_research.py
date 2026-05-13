@@ -33,7 +33,7 @@ def infinite_research(researcher: Researcher):
 def main():
     """ Основная функция """
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
-        description='A program for researching Chinese hieroglyphs. '
+        description='A program for collecting information about Chinese hieroglyphs. '
                     'It generates new words in the chosen research mode, '
                     'and then adds them to hieroglyph databases.',
         epilog='research modes:\n' + '\n'.join([

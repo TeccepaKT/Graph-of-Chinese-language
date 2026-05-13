@@ -5,11 +5,12 @@
 """
 
 import sys
-
 from typing import Callable
 from abc import ABC
 from enum import Enum, auto
 from functools import wraps
+
+from utils.paths import Paths
 
 
 class DepthLogger(ABC):
@@ -35,7 +36,7 @@ class DepthLogger(ABC):
 
 class AIDebugLogger(DepthLogger):
 	""" Логгер для работы с AI """
-	_file = open('./research_ai/ai_requests/logger_output.log', 'w')
+	_file = open(Paths.research_logger_output, 'w')
 
 	@classmethod
 	def log(cls, *args, **kwargs):
@@ -81,7 +82,7 @@ class ResearchLogger(DepthLogger):
 		""" Вывести сообщение """
 		print(end=' ' * (4 * cls._depth + 1), file=cls._file)
 
-		match type:  # TODO: Эта простая в будущем будет изменена
+		match type:  # TODO: Эта простая логика в будущем будет изменена
 			case cls.MessageType.SPACE:
 				print(end='[ ] ')
 			case cls.MessageType.I:

@@ -11,13 +11,14 @@ from itertools import pairwise
 from functools import reduce
 from os import system
 
+from utils.functions import Num
+
 
 __version__ = '1.2.2.006 HT'
 
 
 system('')  # Включение цветов
 
-Num: TypeAlias = int | float
 Coords: TypeAlias = tuple[Num, Num]
 RGB: TypeAlias = tuple[Num, Num, Num]
 Box: TypeAlias = tuple[Num, Num, Num, Num]

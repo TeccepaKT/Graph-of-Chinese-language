@@ -9,15 +9,10 @@ import json
 from typing import Any
 from time import time
 
-from chinese import is_hieroglyph
+from chinese import is_hieroglyph, Hieroglyph
+from utils.paths import Paths
 from loggers import ResearchLogger as Logger
 from work_with_bases import validator
-
-
-class BasePaths:
-    """ Относительные пути для баз иероглифов """
-    path_to_saves: str = 'save_raw'
-    validate_format_file: str = '.valid_format.json'
 
 
 class Base:
@@ -29,9 +24,9 @@ class Base:
     # Добавляйте нижнее подчёркивание в начале к этим ключам, чтобы валидатор не обращал внимания
     #  на то, что добавлены неизвестные ключи
 
-    _contains: set[str]  # Иероглифы, находящиеся в базе
+    _contains: set[Hieroglyph]  # Иероглифы, находящиеся в базе
     _path_to_saves: str  # Путь к файлам, которые будут продублированы, чтобы не потерять их при ошибке (опционально)
-    _valid_format_scheme: object  # Схема правильного json-формата для валидации файлов в базе (обязателен)
+    _valid_format_scheme: dict  # Схема правильного json-формата для валидации файлов в базе (обязателен)
 
     def __init__(self, path: str, additional_format_info: dict[str, Any]):
         if not os.path.isdir(path):
@@ -41,16 +36,16 @@ class Base:
         self._path = path
         self._additional_format_info = additional_format_info
         self._contains = set()
-        self._path_to_saves = f'{path}/{BasePaths.path_to_saves}'  # Может не существовать
+        self._path_to_saves = f'{path}/{Paths.Base.path_to_saves}'  # Может не существовать
 
-        validate_file_path: str = f'{self._path}/{BasePaths.validate_format_file}'
+        validate_file_path: str = f'{self._path}/{Paths.Base.validate_format_file}'
         if not os.path.isfile(validate_file_path):
             raise FileNotFoundError(f'The base must contain a {validate_file_path} file')
 
         with open(validate_file_path, 'r') as f:
             self._valid_format_scheme = json.load(f)
 
-        # Загрузка иероглифов, уже находящихся в базе, а также валидация их файлов
+        # Загрузка иероглифов, уже находящихся в базе
         for filename in os.listdir(path):
             hier_path: str = f'{path}/{filename}'
             if not os.path.isfile(hier_path):
@@ -59,21 +54,19 @@ class Base:
             pack: list[str] = filename.split('.')
             if len(pack) != 2 or len(pack[0]) != 1 or not is_hieroglyph(pack[0]) or pack[1] != 'json':
                 continue
-            hier, ext = pack
-            
-            with open(hier_path) as f:
-                hier_text = f.read()
-            validator.validate(hier_text, self._valid_format_scheme,
-                               responding=validator.Responding.MIXED, identifier=hier)
-            
-            self._contains.add(hier)
+            self._contains.add(Hieroglyph.from_validated(pack[0]))
 
-        Logger.log('Base validated', type=Logger.MessageType.V)
-        if validator.invalid_identifiers:
-            text: str = ' '.join(validator.invalid_identifiers)
+        # Валидация
+        Logger.log('Base validation...', type=Logger.MessageType.V)
+
+        invalid: list[str] = self.validate()
+        if invalid:
+            text: str = ' '.join(invalid)
             Logger.log(f'Please fix the following: {text}', type=Logger.MessageType.V)
 
-    def __contains__(self, hier: str) -> bool:
+        Logger.log('Base may be invalid' if invalid else 'Base is validated', type=Logger.MessageType.V)
+
+    def __contains__(self, hier: Hieroglyph) -> bool:
         """ Есть ли иероглиф в базе """
         return hier in self._contains
 
@@ -81,7 +74,7 @@ class Base:
         return iter(self._contains)
 
     # Чтение из базы
-    def read_text(self, hier: str) -> str:
+    def read_text(self, hier: Hieroglyph) -> str:
         """ Вернуть информацию о иероглифе из базы """
         if hier not in self:
             raise KeyError('Cannot read hieroglyph data from base: it does not exists here')
@@ -92,7 +85,7 @@ class Base:
         
         return data
 
-    def read_json(self, hier: str) -> dict | list:
+    def read_json(self, hier: Hieroglyph) -> dict:
         """ Прочесть из базы json-файл """
         return json.loads(self.read_text(hier))
 
@@ -108,7 +101,7 @@ class Base:
         text = text[0] + add + text[1:]
         return text
 
-    def save_raw(self, hier: str, text: str):
+    def save_raw(self, hier: Hieroglyph, text: str):
         """ Функция для сохранения необработанных ответов без добавления доп. информации и проверки на формат
             Если папки с соответствующими сохранениями нет, ничего не делает
             Нужно, чтобы не потерять ответ в случае ошибки """
@@ -119,7 +112,7 @@ class Base:
         with open(path, 'w') as f:
             f.write(text)
 
-    def form_and_write(self, hier: str, text: str, *, rewrite: bool = False):
+    def form_and_write(self, hier: Hieroglyph, text: str, *, rewrite: bool = False):
         """ Безопасно добавить файл для иероглифа с содержимым text
             В файл допишутся дополнительные данные
             Кроме того, пройдёт проверка файла на формат """
@@ -135,7 +128,13 @@ class Base:
             f.write(text)
         self._contains.add(hier)
 
+    def validate(self) -> list[str]:
+        """ Проверить файлы базы. Возвращает список объектов с некорректным содержимым """
+        invalid: list[str] = []
 
-# Базы с версиями форматирования
-base_ai: Base = Base('research_ai/hier_base', {'_version': '1.3.2'})
-base_dicts: Base = Base('research_dictionaries/hier_base', {'_version': '1.0.0'})
+        for hier in self:
+            if not validator.validate(self.read_text(hier), self._valid_format_scheme,
+                                      responding=validator.Responding.MIXED, message=hier):
+                invalid.append(hier)
+
+        return invalid

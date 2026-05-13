@@ -4,10 +4,12 @@
 
 """
 
+from typing import Optional
 from enum import Enum, auto
-
 import json
 import jsonschema
+
+from loggers import ResearchLogger as Logger
 
 
 class Responding(Enum):
@@ -17,21 +19,20 @@ class Responding(Enum):
     HARD = auto()  # Бросить исключение при несоответствии с указанием места
 
 
-invalid_identifiers: list[str] = []  # Объекты для исправления
-
-
-def validate(instance: str, schema: dict, responding: Responding = Responding.HARD, identifier: str = ''):
+def validate(instance: str, schema: dict, responding: Responding = Responding.HARD,
+             message: Optional[str] = None) -> bool:
     """ Проверить на соответствие формату
-        instance должен быть именно str, так как проверяется и синтаксис """
+        instance должен быть именно str, так как также проверяется синтаксис """
     try:
         instance = json.loads(instance)
         jsonschema.validate(instance, schema)
+        return True
 
     except Exception as e:
-        print(f'[v] Bad format: {identifier}')
+        if message is not None:
+            Logger.log(f'Bad format: {message}', type=Logger.MessageType.V)
         if responding == Responding.HARD:
             raise
         if responding == Responding.MIXED:
             print(e)
-        invalid_identifiers.append(identifier)
-
+        return False

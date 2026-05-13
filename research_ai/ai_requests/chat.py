@@ -7,12 +7,6 @@
 from typing import Any
 from abc import ABC, abstractmethod
 from time import sleep
-from random import randint
-
-
-def random_num(a: float, b: float, acc: int = 10000) -> float:
-    """ Случайное число в [a, b] """
-    return a + (b - a) * randint(0, acc) / acc
 
 
 class AIChat(ABC):

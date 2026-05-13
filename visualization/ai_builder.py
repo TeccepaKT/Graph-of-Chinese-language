@@ -50,10 +50,10 @@ class AIBuilder(Builder):
         return coords
 
     def get_graph(self, max_vertices: Optional[int] = None,
-                  comp: Optional[Callable[[Hieroglyph, Hieroglyph], bool]] = None  # Выбор max_vertices иероглифов
+                  comp: Callable[[Hieroglyph], bool] = lambda h: h  # Выбор max_vertices иероглифов
                   ) -> tuple[Graph, np.ndarray, list[Hieroglyph]]:
         """ Получение графа
-            Если задано число max_vertices, необходимо задать comp для сортировки иероглифов и выбора
+            Если задано число max_vertices, задайте comp для сортировки иероглифов и выбора
              лучших (меньших по отношению comp) среди них """
         out: Graph = {}
         base: Base = self.get_base()
@@ -74,6 +74,8 @@ class AIBuilder(Builder):
         hieroglyphs: list[Hieroglyph] = []
         if max_vertices is not None:
             hieroglyphs = heapq.nsmallest(max_vertices, base, key=comp)
+        else:
+            hieroglyphs = list(base)
 
         for hier in hieroglyphs:  # Можно также добавлять синонимы иероглифов
             number(hier)

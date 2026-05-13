@@ -19,7 +19,7 @@ from work_with_bases.ai_base import ai_base
 from visualization.ai_builder import ai_builder
 
 
-max_vertices: int = 300  # Максимум отображаемых вершин
+max_vertices: int = 35  # Максимум отображаемых вершин
 # Будет добавлено больше настроек
 
 
@@ -52,7 +52,7 @@ def view_graph():
 
     lines: list[np.ndarray] = [
         np.vstack((nodes_coords[u, :], nodes_coords[v, :]))
-        for u in graph for v in graph[u] if u < v and graph[u][v] >= 0.93
+        for u in graph for v in graph[u] if u < v and graph[u][v] >= 0.6
     ]  # Линии; граф неориентированный
     line_collection: Line3DCollection = Line3DCollection(lines, rasterized=True)
     ax.add_collection(line_collection)
